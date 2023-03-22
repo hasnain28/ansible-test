@@ -1,0 +1,26 @@
+- name: Enable Sury repositories on Debian
+  hosts: vm02
+  become: true
+  tasks:
+  - name: Ensure apt-transport-https is installed
+    apt:
+      pkg: apt-transport-https
+      state: present
+
+  - name: Add Sury apt key
+    become: true
+    apt_key:
+      url: https://packages.sury.org/php/apt.gpg
+      state: present
+    tags: php
+
+  - name: Add Sury repositories for PHP
+    become: true
+    apt_repository:
+      repo: 'deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main'
+      state: present
+      update_cache: true
+      validate_certs: true
+      filename: sury
+    tags: php
+

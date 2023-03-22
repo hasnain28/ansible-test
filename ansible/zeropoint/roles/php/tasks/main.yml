@@ -1,0 +1,88 @@
+---
+- name: Enable Sury repositories on Debian
+  when: ansible_distribution == 'Debian'
+  become: true
+  block:
+  - name: Ensure apt-transport-https is installed
+    apt:
+      pkg: apt-transport-https
+      state: present
+
+  - name: Add Sury apt key
+    become: true
+    apt_key:
+      url: https://packages.sury.org/php/apt.gpg
+      state: present
+    tags: php
+
+  - name: Add Sury repositories for PHP
+    become: true
+    apt_repository:
+      repo: 'deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main'
+      state: present
+      update_cache: true
+      validate_certs: true
+      filename: sury
+    tags: php
+
+- name: 'Install PHP (WARNING: apache2 might be installed as a dependency)'
+  become: true
+  apt:
+    pkg: '{{ item }}'
+    update_cache: true
+    cache_valid_time: 3600
+    state: latest
+    autoclean: true
+    autoremove: true
+  loop:
+    - 'php{{ php_version }}-cgi'
+    - 'php{{ php_version }}'
+
+- name: Install PHP-FPM
+  become: true
+  apt:
+    pkg: 'php{{ php_version }}-fpm'
+    update_cache: true
+    cache_valid_time: 3600
+    state: latest
+    autoclean: true
+    autoremove: true
+
+- name: Install common PHP libraries
+  become: true
+  apt:
+    pkg: '{{ php_libraries }}'
+    update_cache: true
+    cache_valid_time: 3600
+    state: latest
+    autoclean: true
+    autoremove: true
+
+- name: Install host specific PHP libraries
+  become: true
+  apt:
+    pkg: '{{ extra_php_libraries }}'
+    update_cache: true
+    cache_valid_time: 3600
+    state: latest
+    autoclean: true
+    autoremove: true
+  when: extra_php_libraries is defined
+
+- name: Ensure PHP-FPM is enabled and running
+  become: true
+  systemd:
+    name: php{{ php_version }}-fpm
+    state: started
+    enabled: true
+
+- name: Configure fail2ban jails
+  become: true
+  copy:
+    src: fail2ban.jails
+    dest: /etc/fail2ban/jail.d/php.conf
+    mode: 0400
+    owner: root
+    group: root
+  notify: reload fail2ban
+  tags: firewall

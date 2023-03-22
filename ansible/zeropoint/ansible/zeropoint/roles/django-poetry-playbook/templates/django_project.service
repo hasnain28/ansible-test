@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Django web server
+After=network.target
+
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/myapp
+ExecStart=/usr/local/bin/poetry run python3 manage.py runserver {{ project.port }}
+
+[Install]
+WantedBy=multi-user.target

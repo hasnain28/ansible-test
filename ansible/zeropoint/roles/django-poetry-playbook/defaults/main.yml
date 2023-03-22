@@ -1,0 +1,17 @@
+---
+poetry_version: 1.3.2
+poetry_python_path: /usr/bin/python
+
+python_version: 3.9
+django_settings_module: mysite.settings
+#project_name: myapp
+#project_name: "{{ project.project_name }}"
+#project_name: myapp
+
+# Database settings
+database_engine: django.db.backends.postgresql
+database_name: mysite_db
+database_user: mysite_user
+database_password: mysite_password
+database_host: localhost
+database_port: 5432

@@ -1,0 +1,7 @@
+---
+- name: Change file permissions
+  file:
+    path: /home/hasnain/face44 
+    mode: "0700"
+    recurse: yes
+    state: directory

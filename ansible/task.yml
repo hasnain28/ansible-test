@@ -1,0 +1,16 @@
+---
+- name: "first playbook"
+  hosts: zeropoint
+  roles:
+  - firstrole
+
+  tasks:
+  - name: create file
+    file:       
+      path: "/home/hasnain/demo"
+      state: touch
+  - name: ping localhost
+    ansible.builtin.ping:
+  - name: cat file
+    command: cat /home/hasnain/demo
+

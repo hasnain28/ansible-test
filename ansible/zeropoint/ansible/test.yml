@@ -1,0 +1,6 @@
+---
+
+- name: testing roles
+  hosts: zeropoint
+  roles:
+    - test

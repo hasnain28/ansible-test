@@ -1,0 +1,44 @@
+---
+- name: "prepare clone directory [{{ project.project_name }}]"
+  become: true
+  file: 
+    group: www-data
+    mode: 0755
+    owner: www-data
+    state: directory
+    path: "/var/www/{{ project.project_name }}"
+
+- name: "clone django project [{{ project.project_name }}]"
+  become: true
+  become_user: www-data
+  git:
+    repo: "gitolite@git.zeropoint.hr:{{ project.repo }}"
+    dest: "/var/www/{{ project.project_name }}"
+    force: yes
+
+- name: "install project dependencies with Poetry [{{ project.project_name }}]"
+  become: true
+  become_user: www-data
+  shell: |
+    poetry config virtualenvs.create true
+    poetry install --no-interaction
+  args:
+    chdir: "/var/www/{{ project.project_name }}"
+
+- name: "create systemd unit file [{{ project.project_name }}]"
+  become: true
+  template:
+    src: django_project.service
+    dest: "/etc/systemd/system/django_{{ project.project_name }}.service"
+
+#if previous task result in change restart the service  
+ 
+- name: "start django service [{{ project.project_name }}]"
+  become: true
+  #become_user: www-data
+  systemd:
+    name: "django_{{ project.project_name }}.service"
+    state: started
+    enabled: true
+    daemon_reload: true
+

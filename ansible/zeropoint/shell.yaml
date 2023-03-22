@@ -1,0 +1,10 @@
+---
+- hosts: all
+  vars:
+    ansible_connection: local
+  tasks:
+    - name: "git checkout"
+      local_action:
+        module: git
+        repo: "git@github.com:hasnain28/django-test.git"
+        dest: "/home/hasnain/Desktop"

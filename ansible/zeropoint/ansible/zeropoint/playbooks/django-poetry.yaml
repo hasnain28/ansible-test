@@ -1,0 +1,43 @@
+---
+- name: Install Poetry, activate it, clone Django project, and run it
+  hosts: webserver
+
+  vars:
+    project_name: myproject
+    project_repo: https://github.com/myusername/myproject.git
+    project_branch: master
+
+  tasks:
+- name: Install Python dependencies for Poetry
+  apt:
+  name: "{{ item }}"
+  state: present
+  loop:
+  - python3-pip
+  - python3-venv
+  - curl
+
+- name: Install Poetry
+  shell: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+  environment:
+  PATH: "{{ ansible_env.PATH }}:/root/.poetry/bin/"
+
+- name: Activate Poetry
+  shell: source $HOME/.poetry/env && poetry config virtualenvs.in-project true
+
+- name: Clone Django project
+  git:
+  repo: "{{ project_repo }}"
+  dest: "/var/www/{{ project_name }}"
+  version: "{{ project_branch }}"
+
+- name: Install project dependencies with Poetry
+  shell: poetry install
+  args:
+  chdir: "/var/www/{{ project_name }}"
+
+- name: Run Django project
+  shell: poetry run python manage.py runserver
+  args:
+  chdir: "/var/www/{{ project_name }}/"
+

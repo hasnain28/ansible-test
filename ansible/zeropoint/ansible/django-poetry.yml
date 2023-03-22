@@ -1,0 +1,5 @@
+---
+- name: Deploy Django application
+  hosts: vm02
+  roles:
+    - django-poetry-playbook

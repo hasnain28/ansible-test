@@ -1,0 +1,14 @@
+---
+
+
+- name: Update package index
+  become: yes
+  apt:
+   update_cache: yes
+
+- name: Install Git package
+  become: yes
+  apt:
+    name: "{{ package }}"
+    state: present
+

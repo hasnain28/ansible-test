@@ -1,0 +1,32 @@
+---
+- name: prepare home directory for www-data
+  become: true
+  file: 
+    group: www-data
+    mode: 0755
+    owner: www-data
+    state: directory
+    path: "/var/www/{{ item }}"
+  loop:
+    - .cache
+    - .local
+     
+- name: install pip
+  become: true
+  apt:
+    name: python3-pip
+    state: latest
+
+- name: install poetry using pip
+  become: true
+  become_user: www-data
+  pip:
+    name: poetry
+    executable: pip3
+    state: latest
+
+- name: run tasks from deploy django project
+  include_tasks: deploy-django-project.yml
+  loop: "{{ django_projects }}"
+  loop_control: 
+    loop_var: project

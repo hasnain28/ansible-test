@@ -1,0 +1,65 @@
+- name: Clone and deploy Django website
+  hosts: all
+  become: true
+
+  vars:
+    project_name: mysite
+    repo_url: https://github.com/example/mysite.git
+    python_version: 3.9
+
+  tasks:
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+- name: Clone repository
+  git:
+    repo: "{{ repo_url }}"
+    dest: "/var/www/{{ project_name }}"
+    version: main
+    
+- name: Install project dependencies
+  pip:
+    requirements: "/var/www/{{ project_name }}/requirements.txt"
+    executable: "/usr/bin/python{{ python_version }}"
+    
+- name: Create virtual environment
+  command: "/usr/bin/python{{ python_version }} -m venv /var/www/{{ project_name }}/venv"
+ 
+- name: Activate virtual environment
+  command: "source /var/www/{{ project_name }}/venv/bin/activate"
+
+- name: Migrate database
+  django_manage:
+    command: migrate
+    app_path: "/var/www/{{ project_name }}"
+
+- name: Start Django process
+  systemd:
+    name: "{{ project_name }}.service"
+    enabled: yes
+    state: started
+    daemon_reload: yes
+    user: "{{ project_name }}"
+    working_directory: "/var/www/{{ project_name }}"
+    environment:
+      PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      LANG: "en_US.UTF-8"
+
+
+---
+project_name: mysite
+project_user: mysiteuser
+project_group: mysitegroup
+python_version: 3.9
+django_settings_module: mysite.settings
+
+# Database settings
+database_engine: django.db.backends.postgresql
+database_name: mysite_db
+database_user: mysite_user
+database_password: mysite_password
+database_host: localhost
+database_port: 5432
+

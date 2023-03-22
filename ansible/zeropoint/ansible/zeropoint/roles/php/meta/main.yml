@@ -1,0 +1,6 @@
+galaxy_info:
+  author: Bart Van Loon
+  description: Installs PHP and PHP-FPM
+
+dependencies:
+  - iptables

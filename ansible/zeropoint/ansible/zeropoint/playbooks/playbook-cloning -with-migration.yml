@@ -1,0 +1,40 @@
+---
+- name: Deploy Django website
+  hosts: web_servers
+  become: yes
+  vars:
+    django_project_path: /path/to/your/django/project
+    virtualenv_path: /path/to/your/virtualenv
+
+  tasks:
+    - name: Update packages
+      apt:
+        update_cache: yes
+
+    - name: Install Python and pip
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python3
+        - python3-pip
+
+    - name: Install required packages
+      pip:
+        name:
+          - uwsgi
+          - Django
+        virtualenv: "{{ virtualenv_path }}"
+
+    - name: Collect static files
+      command: "{{ virtualenv_path }}/bin/python {{ django_project_path }}/manage.py collectstatic --noinput"
+
+    - name: Migrate database
+      command: "{{ virtualenv_path }}/bin/python {{ django_project_path }}/manage.py migrate --noinput"
+
+    - name: Start uWSGI service
+      systemd:
+        name: uwsgi
+        state: started
+        enabled: yes
+

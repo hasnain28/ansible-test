@@ -1,0 +1,30 @@
+---
+- name: Clone repository
+  git:
+    repo: "{{ repo_url }}"
+    dest: "/var/www/{{ project_name }}"
+    version: main 
+
+
+- name: Install project dependencies
+  command: 
+    chdir: /var/www/{{ project_name }} 
+    cmd: poetry install
+
+- name: Migrate database
+  django_manage:
+    command: migrate
+    app_path: "/var/www/{{ project_name }}"
+
+- name: Start Django process
+  systemd:
+    name: "{{ project_name }}.service"
+    enabled: yes
+    state: started
+    daemon_reload: yes
+    user: "{{ project_name }}"
+    working_directory: "/var/www/{{ project_name }}"
+    environment:
+      PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      LANG: "en_US.UTF-8"
+

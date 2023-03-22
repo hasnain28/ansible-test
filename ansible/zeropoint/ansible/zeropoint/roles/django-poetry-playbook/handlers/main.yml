@@ -1,0 +1,7 @@
+---
+- name: "restart django service"
+  listen: restart-django-service
+  systemd:
+    daemon_reload: true
+    state: restarted
+    name: "django_{{ current_project }}.service" 

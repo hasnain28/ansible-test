@@ -1,0 +1,40 @@
+- name: Install Python dependencies for Poetry
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+  - python3
+  - python3-pip
+
+- name: install poetry
+  shell:  |
+    if ! home/hasnain/.local/bin/poetry --version | grep -q '{{ poetry_version }}$'; then
+      curl -sSL https://install.python-poetry.org | {{ poetry_python_path }} - --version {{ poetry_version }}
+      if ! /home/hasnain/.local/bin/poetry --version | grep -q '{{ poetry_version }}$'; then
+        exit 1
+      else
+        echo status=changed
+      fi
+    fi
+
+- name: add path to .bashrc
+  lineinfile:
+    path: "~/.bashrc"
+    line: 'export PATH="$PATH:$HOME/.local/bin"'
+    state: present
+    create: yes
+
+- name: Clone Django project
+  git:
+    repo: "{{ project_repo }}"
+    dest: "/var/www/{{ project_name }}"
+
+- name: Install project dependencies with Poetry
+  shell: ~/.local/bin/poetry install
+  args:
+    chdir: "/var/www/{{ project_name }}"
+
+- name: Run Django project
+  shell: ~/.local/bin/poetry run python manage.py runserver
+  args:
+    chdir: "/var/www/{{ project_name }}/"

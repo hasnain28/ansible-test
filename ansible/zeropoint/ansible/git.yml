@@ -1,0 +1,13 @@
+- name: Install Git
+  hosts: vm02
+  become: yes
+
+  tasks:
+  - name: Update package index
+    apt:
+      update_cache: yes
+
+  - name: Install Git package
+    apt:
+      name: git
+      state: present

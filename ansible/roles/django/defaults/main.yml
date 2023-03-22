@@ -1,0 +1,20 @@
+---
+package:
+  - python3
+  - python3-pip
+  - libpq-dev
+  - postgresql
+  - nginx
+  - python3-venv
+
+packages:
+  - Django
+  - psycopg2
+
+project_name: my_django_project_hasnain
+
+group: admin
+username: hasnain       
+password: hasnain
+
+

@@ -1,0 +1,15 @@
+---
+django_projects: 
+  - project_name: django-poetry
+    database_password: abcd
+    repo: django-ansible-test
+    port: 45677
+    service: myproject.service
+  - project_name: willfail
+    database_password: fghi
+    repo: django-ansible-test-bis
+    port: 45678
+    service: willfail.service
+#package:
+# - python3-apt
+ 

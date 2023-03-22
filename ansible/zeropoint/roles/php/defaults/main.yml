@@ -1,0 +1,11 @@
+---
+php_version: 7.0
+php_libraries:
+  - php{{ php_version }}-enchant
+  - php-net-idna2
+  - php{{ php_version }}-mbstring
+  - php{{ php_version }}-mysql
+  - libphp-phpmailer
+  - libphp-simplepie
+  - php{{ php_version }}-xml
+  - php{{ php_version }}-zip

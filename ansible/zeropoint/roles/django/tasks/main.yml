@@ -1,0 +1,31 @@
+---
+- name: Install system packages
+  apt:
+    name: '{{ package }}'
+    state: present
+
+- name: clone repository
+  git:
+    repo: git.face44.com:{{ project_name }}
+
+- name: Create database tables
+  shell: |
+    cd {{ project_name }}
+    python3 manage.py migrate
+
+- name: Configure nginx
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/{{ project_name }}
+    mode: 0644
+  notify:
+    - restart nginx
+
+- name: Symlink nginx configuration
+  file:
+    src: /etc/nginx/sites-available/{{ project_name }}
+    dest: /etc/nginx/sites-enabled/{{ project_name }}
+    state: link
+  notify:
+    - restart nginx
+
